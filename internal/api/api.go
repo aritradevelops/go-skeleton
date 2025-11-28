@@ -26,7 +26,6 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	// TODO: connect to database
 
 	httpServer := http.NewServer(config, db)
 
@@ -45,6 +44,9 @@ func Run() error {
 	if err := httpServer.Shutdown(shutdownContext); err != nil {
 		return err
 	}
-	// TODO: close the database connection
+
+	if err := db.Disconnect(); err != nil {
+		return err
+	}
 	return nil
 }

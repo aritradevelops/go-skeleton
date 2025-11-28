@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -40,7 +41,7 @@ func (p *Postgres) Connect() error {
 		}),
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open connection: %v", err)
 	}
 	underline, err := db.DB()
 	if err != nil {
@@ -55,7 +56,7 @@ func (p *Postgres) Disconnect() error {
 		return NotInitializedErr("Postgres")
 	}
 	err := p.underline.Close()
-	return err
+	return fmt.Errorf("failed to disconnect the database connection: %v", err)
 }
 func (p *Postgres) Health() error {
 	if p.db == nil {
