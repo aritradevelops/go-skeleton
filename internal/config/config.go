@@ -43,6 +43,7 @@ func Load(readEnv bool) (Config, error) {
 	}
 
 	config.Http = httpConfig
+
 	config.Db = dbConfig
 	config.ServiceName = getEnv("SERVICE_NAME")
 

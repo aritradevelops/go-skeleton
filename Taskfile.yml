@@ -14,3 +14,11 @@ tasks:
     cmd: docker-compose -f infra/docker/postgres/docker-compose.yml up -d
   run_server:
     cmd: air
+  generate_migrations:
+    cmds: 
+      - | 
+        echo "please enter the migration name:"
+        read migration;
+        atlas migrate diff ${migration} --env local --to "file://schema.sql";
+  apply_migrations:
+    cmd: atlas migrate apply --env local

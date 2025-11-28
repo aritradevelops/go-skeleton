@@ -1,11 +1,15 @@
 package db
 
-import "fmt"
+import (
+	"fmt"
+	"skeleton-test/internal/sqlc"
+)
 
 type Database interface {
 	Connect() error
 	Disconnect() error
 	Health() error
+	Conn() (sqlc.DBTX, error)
 }
 
 func NotInitializedErr(what string) error {

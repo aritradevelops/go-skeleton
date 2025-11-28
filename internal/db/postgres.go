@@ -1,23 +1,21 @@
 package db
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
-	"log"
-	"os"
+	"skeleton-test/internal/sqlc"
 	"time"
 
 	_ "ariga.io/atlas-provider-gorm/gormschema"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"github.com/jackc/pgx/v5"
 )
+
+const wait = 30 * time.Second
 
 // implements Database
 type Postgres struct {
-	uri       string
-	db        *gorm.DB
-	underline *sql.DB
+	uri  string
+	conn *pgx.Conn
 }
 
 func NewPostgres(uri string) Database {
@@ -27,45 +25,37 @@ func NewPostgres(uri string) Database {
 }
 
 func (p *Postgres) Connect() error {
-	logFile, err := os.OpenFile("gorm.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	connectionCtx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	conn, err := pgx.Connect(connectionCtx, p.uri)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to connect to the database : %v", err)
 	}
-	db, err := gorm.Open(postgres.Open(p.uri), &gorm.Config{
-		TranslateError: true,
-		Logger: logger.New(log.New(logFile, "\r\n", log.LstdFlags), logger.Config{
-			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Info, // Log level
-			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,       // Disable color
-		}),
-	})
-	if err != nil {
-		return fmt.Errorf("failed to open connection: %v", err)
-	}
-	underline, err := db.DB()
-	if err != nil {
-		return err
-	}
-	p.db = db
-	p.underline = underline
+	p.conn = conn
 	return nil
 }
 func (p *Postgres) Disconnect() error {
-	if p.db == nil {
+	if p.conn == nil {
 		return NotInitializedErr("Postgres")
 	}
-	err := p.underline.Close()
+	disconnectionCtx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	err := p.conn.Close(disconnectionCtx)
 	return fmt.Errorf("failed to disconnect the database connection: %v", err)
 }
 func (p *Postgres) Health() error {
-	if p.db == nil {
+	if p.conn == nil {
 		return NotInitializedErr("Postgres")
 	}
-	err := p.underline.Ping()
+	pingCtx, cancel := context.WithTimeout(context.Background(), wait)
+	defer cancel()
+	err := p.conn.Ping(pingCtx)
 	return err
 }
 
-func (p *Postgres) Db() *gorm.DB {
-	return p.db
+func (p *Postgres) Conn() (sqlc.DBTX, error) {
+	if p.conn == nil {
+		return nil, NotInitializedErr("Postgres")
+	}
+	return p.conn, nil
 }

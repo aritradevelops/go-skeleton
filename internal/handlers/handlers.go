@@ -3,20 +3,29 @@ package handlers
 import (
 	"skeleton-test/internal/config"
 	"skeleton-test/internal/db"
+	"skeleton-test/internal/services"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type Handlers struct {
-	db     db.Database
-	config config.Config
+	db       db.Database
+	config   config.Config
+	services *services.Services
+	Auth     *AuthHandler
 }
 
 func New(db db.Database, config config.Config) *Handlers {
+	conn, _ := db.Conn()
+	services := services.New(conn)
 	return &Handlers{
-		db:     db,
-		config: config,
+		db:       db,
+		config:   config,
+		services: services,
+		Auth: &AuthHandler{
+			services: services,
+		},
 	}
 }
 
