@@ -41,7 +41,10 @@ func (p *Postgres) Disconnect() error {
 	disconnectionCtx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
 	err := p.conn.Close(disconnectionCtx)
-	return fmt.Errorf("failed to disconnect the database connection: %v", err)
+	if err != nil {
+		return fmt.Errorf("failed to disconnect the database connection: %v", err)
+	}
+	return nil
 }
 func (p *Postgres) Health() error {
 	if p.conn == nil {
@@ -50,7 +53,10 @@ func (p *Postgres) Health() error {
 	pingCtx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
 	err := p.conn.Ping(pingCtx)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to ping the database: %v", err)
+	}
+	return nil
 }
 
 func (p *Postgres) Conn() (sqlc.DBTX, error) {
