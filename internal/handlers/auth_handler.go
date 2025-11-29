@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"skeleton-test/internal/services"
+	"skeleton-test/internal/translation"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,9 +23,5 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 	c.Status(http.StatusCreated)
-	return c.JSON(fiber.Map{
-		"message": "User registered successfully!.",
-		"data":    nil,
-		"error":   nil,
-	})
+	return c.JSON(NewSuccessResponse(translation.Localize(c, "user.register"), nil))
 }
