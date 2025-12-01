@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"skeleton-test/internal/config"
 	"skeleton-test/internal/db"
+	"skeleton-test/internal/services"
 	"skeleton-test/internal/translation"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,12 +14,13 @@ import (
 )
 
 type Server struct {
-	app    *fiber.App
-	db     db.Database
-	config config.Config
+	app      *fiber.App
+	db       db.Database
+	services *services.Services
+	config   config.Config
 }
 
-func NewServer(config config.Config, db db.Database) *Server {
+func NewServer(config config.Config, db db.Database, services *services.Services) *Server {
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: errorHandler,

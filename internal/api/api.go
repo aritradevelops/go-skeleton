@@ -8,6 +8,7 @@ import (
 	"skeleton-test/internal/config"
 	"skeleton-test/internal/db"
 	"skeleton-test/internal/http"
+	"skeleton-test/internal/services"
 	"syscall"
 	"time"
 )
@@ -27,8 +28,14 @@ func Run() error {
 		return err
 	}
 
-	httpServer := http.NewServer(config, db)
+	// build services
+	conn, _ := db.Conn()
+	srv := services.New(conn)
 
+	// build server
+	httpServer := http.NewServer(config, db, srv)
+
+	// run server in separate goroutine
 	go func() {
 		if err := httpServer.Start(); err != nil {
 			log.Fatalf("failed to start the http server: %v", err)

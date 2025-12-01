@@ -7,7 +7,38 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+const insertPassword = `-- name: InsertPassword :one
+INSERT INTO "passwords" (
+  hashed_password, created_by
+) VALUES (
+  $1, $2
+) RETURNING id, hashed_password, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
+`
+
+type InsertPasswordParams struct {
+	HashedPassword string
+	CreatedBy      pgtype.UUID
+}
+
+func (q *Queries) InsertPassword(ctx context.Context, arg InsertPasswordParams) (Password, error) {
+	row := q.db.QueryRow(ctx, insertPassword, arg.HashedPassword, arg.CreatedBy)
+	var i Password
+	err := row.Scan(
+		&i.ID,
+		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+		&i.DeletedAt,
+		&i.DeletedBy,
+	)
+	return i, err
+}
 
 const registerUser = `-- name: RegisterUser :one
 INSERT INTO "users" (

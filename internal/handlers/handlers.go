@@ -16,9 +16,7 @@ type Handlers struct {
 	Auth     *AuthHandler
 }
 
-func New(db db.Database, config config.Config) *Handlers {
-	conn, _ := db.Conn()
-	services := services.New(conn)
+func New(db db.Database, config config.Config, services *services.Services) *Handlers {
 	return &Handlers{
 		db:       db,
 		config:   config,

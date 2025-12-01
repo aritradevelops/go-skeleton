@@ -8,6 +8,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Password struct {
+	ID             pgtype.UUID
+	HashedPassword string
+	CreatedAt      pgtype.Timestamptz
+	CreatedBy      pgtype.UUID
+	UpdatedAt      pgtype.Timestamptz
+	UpdatedBy      pgtype.UUID
+	DeletedAt      pgtype.Timestamptz
+	DeletedBy      pgtype.UUID
+}
+
 type User struct {
 	ID        pgtype.UUID
 	Email     string
