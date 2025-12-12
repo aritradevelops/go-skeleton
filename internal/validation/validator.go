@@ -33,7 +33,9 @@ type ValidationError struct {
 type ValidationErrors []ValidationError
 
 func Validate(obj any) ValidationErrors {
+	fmt.Println("before validation")
 	err := validate.Struct(obj)
+	fmt.Println("after validation")
 	if err != nil {
 		out := ValidationErrors{}
 		for _, e := range err.(validator.ValidationErrors) {

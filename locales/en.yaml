@@ -18,5 +18,6 @@ validation:
   required: "The {{.Field}} is required."
   min: "The {{.Field}} must be of length {{.Param}} or more."
   unique: "The {{.Field}} must be unique."
+  email: "The given email is not valid."
 user:
   register: "User registered successfully."

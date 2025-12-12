@@ -29,9 +29,10 @@ func NewServer(config config.Config, db db.Database, services *services.Services
 	app.Use(logger.New())
 	app.Use(translation.New())
 	server := &Server{
-		config: config,
-		db:     db,
-		app:    app,
+		config:   config,
+		db:       db,
+		app:      app,
+		services: services,
 	}
 
 	server.setupRoutes()

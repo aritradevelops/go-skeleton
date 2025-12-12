@@ -17,6 +17,7 @@ import (
 
 func errorHandler(c *fiber.Ctx, e error) error {
 	if e != nil {
+		fmt.Println(e)
 		// handle validation error
 		if errs, ok := e.(validation.ValidationErrors); ok {
 			c.Status(http.StatusBadRequest)
@@ -46,7 +47,6 @@ func errorHandler(c *fiber.Ctx, e error) error {
 				}))
 			}
 		}
-
 		c.Status(http.StatusInternalServerError)
 		return c.JSON(handlers.NewErrorResponse(translation.Localize(c, fmt.Sprintf("errors.%d", http.StatusInternalServerError)), e))
 	}

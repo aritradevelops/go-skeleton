@@ -15,10 +15,12 @@ tasks:
   run_server:
     cmd: air
   generate_migrations:
-    cmds: 
-      - | 
+    cmds:
+      - |
         echo "please enter the migration name:"
         read migration;
         atlas migrate diff ${migration} --env local --to "file://schema.sql";
   apply_migrations:
     cmd: atlas migrate apply --env local
+  hash_migrations:
+    cmd: atlas migrate hash --dir "file://internal/migrations"
